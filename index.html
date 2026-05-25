@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#FF5C1A"/>
+  <title>สกลไท — รับเขียนโปรแกรม ทุกรูปแบบ</title>
+  <meta name="description" content="สกลไท รับพัฒนาโปรแกรม CRM ERP ร้านอาหาร ราคาเป็นธรรม ทีมคนไทย ดูแลจริง"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Calistoga&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#F5F0E8; --ink:#0D0D0D; --or:#FF5C1A;
+      --olt:#FFF0EA; --bk:#090909; --mu:#6B6560;
+      --br:#D5CFC5; --wh:#FDFBF8;
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;font-size:17px;line-height:1.65;cursor:none}
+    @media(hover:none){body{cursor:auto}}
+    .D{font-family:'Calistoga',serif;font-weight:400;letter-spacing:-.03em;line-height:1}
+    .c{max-width:1240px;margin:0 auto;padding:0 40px}
+
+    /* GRAIN */
+    body::after{content:'';position:fixed;inset:0;z-index:9000;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.03}
+
+    /* PROGRESS */
+    #prog{position:fixed;top:0;left:0;right:0;z-index:9500;height:2px;background:var(--or);transform-origin:left;transform:scaleX(0);transition:transform .05s linear}
+
+    /* LOADER */
+    #load{position:fixed;inset:0;z-index:9999;background:var(--bk);display:flex;align-items:center;justify-content:center;transition:opacity .5s .2s,visibility .5s .2s}
+    #load.out{opacity:0;visibility:hidden}
+    #load-txt{font-family:'Calistoga',serif;font-size:48px;color:var(--wh);letter-spacing:-.04em;opacity:0;transform:translateY(16px);transition:opacity .5s .1s,transform .5s .1s}
+    #load-txt span{color:var(--or)}
+    #load.go #load-txt{opacity:1;transform:translateY(0)}
+
+    /* CURSOR — custom arrow */
+    #cr{position:fixed;z-index:9800;pointer-events:none;width:28px;height:28px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.22));transition:width .28s cubic-bezier(.16,1,.3,1),height .28s cubic-bezier(.16,1,.3,1),filter .2s}
+    #cr svg{width:100%;height:100%;display:block}
+    #cr .arr-fill{fill:var(--or);transition:fill .2s}
+    #cr .arr-stroke{fill:none;stroke:var(--wh);stroke-width:1.6;stroke-linejoin:round;transition:stroke .2s}
+    #cr.big{width:38px;height:38px;filter:drop-shadow(0 4px 14px rgba(255,92,26,.45))}
+    #cr.inv .arr-fill{fill:var(--wh)}
+    #cr.inv .arr-stroke{stroke:rgba(0,0,0,.4)}
+    #cd{display:none}
+    @media(hover:none){#cr{display:none}}
+
+    /* SIDE NAV */
+    .side-nav{position:fixed;left:28px;top:50%;transform:translateY(-50%);z-index:700;display:flex;flex-direction:column;gap:16px;align-items:center}
+    .sn-dot{width:6px;height:6px;border-radius:50%;background:rgba(13,13,13,.18);transition:all .3s cubic-bezier(.16,1,.3,1);cursor:none;position:relative}
+    .sn-dot::after{content:attr(data-label);position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}
+    .sn-dot:hover::after{opacity:1}
+    .sn-dot.active{background:var(--or);width:8px;height:8px}
+    .sn-dot.dark-section{background:rgba(255,255,255,.25)}
+    .sn-dot.dark-section.active{background:var(--wh)}
+    @media(max-width:1024px){.side-nav{display:none}}
+
+    /* NAV */
+    .nav{position:fixed;top:0;left:0;right:0;z-index:800;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;transition:background .3s,border-color .3s}
+    .nav.on{background:rgba(245,240,232,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--br)}
+    .nav-logo{font-family:'Calistoga',serif;font-size:22px;color:var(--ink);text-decoration:none;letter-spacing:-.04em}
+    .nav-logo s{color:var(--or);text-decoration:none}
+    .nav-r{display:flex;align-items:center;gap:16px}
+    .nav-ph{font-size:14px;font-weight:600;color:var(--mu);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .2s}
+    .nav-ph:hover{color:var(--or)}
+    .nav-ph svg{width:13px;height:13px;stroke:var(--or);fill:none;stroke-width:2;stroke-linecap:round}
+    .nav-btn{background:var(--ink);color:var(--wh);padding:10px 22px;border-radius:999px;text-decoration:none;font-size:14px;font-weight:700;transition:background .2s,transform .15s}
+    .nav-btn:hover{background:var(--or);transform:scale(1.04)}
+    .ham{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:none;padding:4px}
+    .ham span{display:block;width:22px;height:2px;background:var(--ink);border-radius:2px}
+
+    /* MMENU */
+    .mm{display:none;flex-direction:column;position:fixed;inset:0;z-index:850;background:var(--bk);padding:32px}
+    .mm.on{display:flex}
+    .mm-x{align-self:flex-end;background:none;border:none;color:var(--wh);font-size:32px;cursor:none;line-height:1}
+    .mm a{color:var(--wh);text-decoration:none;font-family:'Calistoga',serif;font-size:clamp(32px,8vw,54px);border-bottom:1px solid rgba(255,255,255,.07);padding:16px 0;transition:color .15s}
+    .mm a:hover{color:var(--or)}
+    .mm-sub{margin-top:24px;font-size:15px;color:rgba(255,255,255,.4)}
+
+    /* ── HERO ── */
+    .hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 0 64px;border-bottom:1px solid var(--br);position:relative;overflow:hidden}
+    .hero-bg-num{position:absolute;right:-2%;top:50%;transform:translateY(-55%);font-family:'Calistoga',serif;font-size:clamp(240px,32vw,460px);color:rgba(13,13,13,.04);line-height:1;pointer-events:none;user-select:none;letter-spacing:-.05em;will-change:transform}
+    .hero-top{padding:140px 40px 0;max-width:1240px;margin:0 auto;width:100%;position:relative}
+    .hero-eye{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--or);margin-bottom:28px}
+    .hero-eye::before{content:'●';font-size:7px;animation:blink 2s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
+    .hero-hl{font-family:'Calistoga',serif;letter-spacing:-.04em;line-height:.95}
+    .hero-hl .ln{display:block}
+    .hero-hl .ln-i{display:block;opacity:1;transform:translateY(0);transition:transform .9s cubic-bezier(.16,1,.3,1),opacity .7s ease}
+    .hero-hl .ln-i.hide{opacity:0;transform:translateY(32px)}
+    .hero-hl .big{font-size:clamp(64px,11vw,148px);color:var(--ink)}
+    .hero-hl .ital{font-size:clamp(64px,11vw,148px);color:var(--or);font-style:italic}
+    .hero-hl .out{font-size:clamp(60px,10.5vw,142px);-webkit-text-stroke:2px var(--ink);color:transparent}
+
+    /* rotating badge */
+    .hero-badge{position:absolute;right:48px;top:160px;width:130px;height:130px;animation:spin 14s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .hero-badge text{font-family:'Sarabun',sans-serif;font-size:11.5px;font-weight:700;letter-spacing:.14em;fill:var(--ink);text-transform:uppercase}
+    .hero-badge-dot{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;animation:spin-r 14s linear infinite}
+    @keyframes spin-r{to{transform:rotate(-360deg)}}
+    .hero-badge-dot svg{width:20px;height:20px;fill:var(--or)}
+    @media(max-width:768px){.hero-badge{display:none}}
+
+    /* scroll hint */
+    .hero-scroll-hint{position:absolute;bottom:20px;right:40px;display:flex;flex-direction:column;align-items:center;gap:6px;opacity:.4}
+    .hero-scroll-hint span{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
+    .hero-scroll-hint-line{width:1px;height:40px;background:var(--ink);transform-origin:top;animation:line-grow 1.8s ease-in-out infinite}
+    @keyframes line-grow{0%,100%{transform:scaleY(0);opacity:0}50%{transform:scaleY(1);opacity:1}}
+
+    .hero-ticker{border-top:1px solid var(--br);border-bottom:1px solid var(--br);overflow:hidden;margin-top:48px}
+    .hero-ticker-track{display:flex;width:max-content;animation:mfwd 18s linear infinite;padding:12px 0}
+    .hero-ticker-item{padding:0 28px;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);white-space:nowrap}
+    .hero-ticker-item .dot{color:var(--or);margin-right:28px}
+    .hero-bottom{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:end;padding:40px 40px 0;max-width:1240px;margin:0 auto;width:100%}
+    .hero-desc{font-size:18px;color:var(--mu);line-height:1.8;max-width:400px}
+    .hero-actions{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+    .btn-or{display:inline-flex;align-items:center;gap:12px;background:var(--or);color:var(--wh);padding:18px 36px;border-radius:999px;font-size:17px;font-weight:700;text-decoration:none;font-family:'Sarabun',sans-serif;position:relative;overflow:hidden;transition:transform .2s}
+    .btn-or::before{content:'';position:absolute;inset:0;background:var(--ink);transform:translateX(-101%);transition:transform .35s cubic-bezier(.16,1,.3,1)}
+    .btn-or:hover{transform:scale(1.02)}
+    .btn-or:hover::before{transform:translateX(0)}
+    .btn-or span,.btn-or svg{position:relative;z-index:1}
+    .btn-or svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s}
+    .btn-or:hover svg{transform:translateX(5px)}
+    .hero-note{font-size:13px;color:var(--mu)}
+
+    /* ── MARQUEE ── */
+    .mq{background:var(--bk);overflow:hidden}
+    .mq-row{display:flex;padding:12px 0;border-bottom:1px solid #1c1c1c}
+    .mq-row:last-child{border-bottom:none}
+    .mq-row.or{background:var(--or);padding:10px 0;border-color:transparent}
+    .mq-t{display:flex;width:max-content}
+    .mq-t.fw{animation:mfwd 20s linear infinite}
+    .mq-t.rv{animation:mrvs 25s linear infinite}
+    @keyframes mfwd{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    @keyframes mrvs{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+    .mq:hover .mq-t{animation-play-state:paused}
+    .mq-i{display:flex;align-items:center;gap:24px;padding:0 24px;white-space:nowrap;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+    .mq-t.fw .mq-i{color:rgba(255,255,255,.38)}
+    .mq-t.rv .mq-i{color:rgba(255,92,26,.55)}
+    .mq-row.or .mq-t .mq-i{color:rgba(0,0,0,.35)}
+    .mq-i .d{font-size:14px;line-height:1}
+
+    /* ── MANIFESTO ── */
+    .manifesto{background:var(--or);padding:90px 0;overflow:hidden;position:relative}
+    .manifesto::before{content:'';position:absolute;top:-60%;right:-10%;width:500px;height:500px;border-radius:50%;background:rgba(255,255,255,.07);pointer-events:none}
+    .manifesto-inner{position:relative;z-index:1}
+    .manifesto-label{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:28px}
+    .manifesto-text{font-family:'Calistoga',serif;font-size:clamp(28px,4.5vw,62px);line-height:1.2;letter-spacing:-.025em;color:var(--wh);max-width:900px}
+    .manifesto-text .w{display:inline-block;opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease}
+    .manifesto-text .w.em-w{color:var(--ink)}
+    .manifesto-text.revealed .w{opacity:1;transform:translateY(0)}
+    .manifesto-foot{display:flex;align-items:center;gap:32px;margin-top:44px;padding-top:32px;border-top:1px solid rgba(255,255,255,.2)}
+    .mf-item{font-size:14px;font-weight:700;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:8px}
+    .mf-item::before{content:'✓';color:var(--ink);font-size:16px;font-weight:900}
+
+    /* ── STATS BENTO ── */
+    .stats{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:auto auto;gap:0}
+    .stat-band{padding:64px 56px;position:relative;overflow:hidden;border:1px solid transparent}
+    .stat-band.featured{grid-row:span 1;grid-column:1}
+    .stat-band:nth-child(1){background:var(--bk);border-color:#1a1a1a}
+    .stat-band:nth-child(2){background:var(--or);grid-column:2;grid-row:span 2}
+    .stat-band:nth-child(3){background:var(--wh);border-color:var(--br)}
+    .stat-band:nth-child(4){background:var(--ink)}
+    .stat-band::after{content:attr(data-label);position:absolute;bottom:24px;right:28px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+    .stat-band:nth-child(1)::after,.stat-band:nth-child(4)::after{color:rgba(255,255,255,.2)}
+    .stat-band:nth-child(2)::after{color:rgba(0,0,0,.25)}
+    .stat-band:nth-child(3)::after{color:rgba(0,0,0,.2)}
+    .stat-n{font-size:12px;font-weight:700;letter-spacing:.12em;margin-bottom:28px}
+    .stat-band:nth-child(1) .stat-n,.stat-band:nth-child(4) .stat-n{color:rgba(255,255,255,.25)}
+    .stat-band:nth-child(2) .stat-n{color:rgba(0,0,0,.3)}
+    .stat-band:nth-child(3) .stat-n{color:var(--mu)}
+    .stat-nm{font-family:'Calistoga',serif;font-size:clamp(22px,2.8vw,34px);line-height:1.15;letter-spacing:-.025em;margin-bottom:16px}
+    .stat-band:nth-child(1) .stat-nm{color:var(--wh)}
+    .stat-band:nth-child(2) .stat-nm{color:var(--bk)}
+    .stat-band:nth-child(3) .stat-nm{color:var(--ink)}
+    .stat-band:nth-child(4) .stat-nm{color:var(--or)}
+    .stat-txt{font-size:14px;line-height:1.8}
+    .stat-band:nth-child(1) .stat-txt,.stat-band:nth-child(4) .stat-txt{color:rgba(255,255,255,.45)}
+    .stat-band:nth-child(2) .stat-txt{color:rgba(0,0,0,.5)}
+    .stat-band:nth-child(3) .stat-txt{color:var(--mu)}
+    @media(max-width:768px){
+      .stats{grid-template-columns:1fr;grid-template-rows:auto}
+      .stat-band:nth-child(2){grid-column:auto;grid-row:auto}
+    }
+
+    /* ── SERVICES ── */
+    .services{padding:90px 0;border-top:1px solid var(--br)}
+    .svc-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:56px;gap:20px}
+    .svc-header h2{font-family:'Calistoga',serif;font-size:clamp(36px,5vw,60px);letter-spacing:-.025em}
+    .svc-header p{font-size:15px;color:var(--mu);max-width:260px;text-align:right;line-height:1.7}
+    .svc-layout{display:grid;grid-template-columns:272px 1fr;border:1px solid var(--br);border-radius:20px;overflow:hidden;background:var(--wh);box-shadow:0 2px 32px rgba(0,0,0,.05)}
+    .svc-tabs{background:var(--wh);border-right:1px solid var(--br)}
+    .svc-tab{display:flex;align-items:center;gap:14px;padding:18px 22px;cursor:none;border-left:3px solid transparent;transition:background .2s,border-color .15s;border-bottom:1px solid var(--br)}
+    .svc-tab:last-child{border-bottom:none}
+    .svc-tab:hover{background:rgba(255,92,26,.04)}
+    .svc-tab.active{border-left-color:var(--or);background:var(--olt)}
+    .svc-tab-n{font-family:'Calistoga',serif;font-size:22px;color:rgba(13,13,13,.1);line-height:1;flex-shrink:0;width:34px;transition:color .2s}
+    .svc-tab.active .svc-tab-n,.svc-tab:hover .svc-tab-n{color:var(--or)}
+    .svc-tab-nm{font-size:14px;font-weight:700;color:var(--ink);line-height:1.3;transition:color .2s}
+    .svc-tab.active .svc-tab-nm{color:var(--or)}
+    .svc-tab-d{font-size:11px;color:var(--mu);margin-top:3px}
+    .svc-preview-wrap{position:relative;background:var(--bg);min-height:500px;overflow:hidden}
+    .svc-panel{position:absolute;inset:0;padding:28px;opacity:0;pointer-events:none;transform:translateY(20px);transition:opacity .35s ease,transform .4s cubic-bezier(.16,1,.3,1);overflow-y:auto}
+    .svc-panel.active{opacity:1;pointer-events:auto;transform:translateY(0)}
+    .svc-panel.exit{opacity:0;transform:translateY(-20px);transition:opacity .18s ease,transform .18s ease;pointer-events:none}
+    .sc-card{background:var(--wh);border:1px solid var(--br);border-radius:14px;overflow:hidden}
+    .sc-bar{background:var(--ink);padding:12px 16px;display:flex;align-items:center;gap:8px}
+    .sc-dots span{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}
+    .sc-dots span:nth-child(1){background:#ef4444}
+    .sc-dots span:nth-child(2){background:#f59e0b}
+    .sc-dots span:nth-child(3){background:#22c55e}
+    .sc-title{font-size:12px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.08em;margin-left:8px}
+    .sc-body{padding:20px}
+    .pos-tables{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+    .pos-tbl{background:var(--bg);border:1px solid var(--br);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:700;cursor:default;transition:background .15s}
+    .pos-tbl.act{background:var(--or);color:var(--wh);border-color:var(--or)}
+    .pos-items{background:var(--bg);border-radius:8px;padding:12px;font-size:13px;margin-bottom:12px}
+    .pos-item{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--br)}
+    .pos-item:last-child{border-bottom:none;font-weight:700;margin-top:4px}
+    .pos-pay{background:var(--or);color:var(--wh);border:none;width:100%;padding:12px;border-radius:8px;font-size:14px;font-weight:700;font-family:'Sarabun',sans-serif;cursor:none}
+    .crm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+    .crm-stat{background:var(--bg);border-radius:8px;padding:10px;text-align:center}
+    .crm-stat .v{font-family:'Calistoga',serif;font-size:20px;color:var(--ink)}
+    .crm-stat .l{font-size:11px;color:var(--mu);margin-top:2px}
+    .crm-bar-wrap{background:var(--bg);border-radius:8px;padding:12px}
+    .crm-br{margin-bottom:10px}
+    .crm-br-top{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:5px}
+    .crm-br-track{height:6px;background:var(--br);border-radius:4px;overflow:hidden}
+    .crm-br-fill{height:100%;border-radius:4px}
+    .erp-list{background:var(--bg);border-radius:8px;overflow:hidden}
+    .erp-hd{display:grid;grid-template-columns:1fr auto auto;gap:12px;padding:8px 14px;background:var(--ink);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+    .erp-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;padding:10px 14px;border-bottom:1px solid var(--br);align-items:center;font-size:13px}
+    .erp-row:last-child{border-bottom:none}
+    .erp-bar-sm{width:60px;height:5px;background:var(--br);border-radius:3px;overflow:hidden}
+    .erp-fill{height:100%;border-radius:3px}
+    .warn{color:#ef4444;font-size:11px;font-weight:700}
+
+    /* ── ABOUT ── */
+    .about{padding:90px 0;border-top:1px solid var(--br)}
+    .about-lbl{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--mu);margin-bottom:24px;display:flex;align-items:center;gap:10px}
+    .about-lbl::after{content:'';flex:1;height:1px;background:var(--br)}
+    .about-stmt{font-family:'Calistoga',serif;font-size:clamp(26px,4vw,52px);line-height:1.2;letter-spacing:-.02em;color:var(--ink);max-width:860px}
+    .about-stmt em{font-style:italic;color:var(--or)}
+    .about-cols{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:56px;padding-top:40px;border-top:1px solid var(--br)}
+    .about-col p{font-size:16px;color:var(--mu);line-height:1.85}
+
+
+
+
+
+
+    /* ── CTA ── */
+    .cta{background:var(--bk);padding:110px 0;position:relative;overflow:hidden}
+    .cta-ring{position:absolute;border-radius:50%;border:1px solid rgba(255,92,26,.15);pointer-events:none}
+    .cta-ring.r1{width:600px;height:600px;top:-200px;right:-150px}
+    .cta-ring.r2{width:900px;height:900px;top:-350px;right:-350px}
+    .cta-inner{position:relative;z-index:1}
+    .cta-lbl{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:24px;display:flex;align-items:center;gap:10px}
+    .cta-lbl::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08)}
+    .cta-h{font-family:'Calistoga',serif;font-size:clamp(48px,8vw,108px);color:var(--wh);line-height:.95;letter-spacing:-.04em;margin-bottom:0}
+    .cta-h em{font-style:italic;color:var(--or)}
+    .cta-phone{font-family:'Calistoga',serif;font-size:clamp(36px,5.5vw,72px);letter-spacing:-.03em;margin:20px 0 40px;line-height:1;display:block;text-decoration:none;background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,92,26,.35),rgba(255,255,255,.12));background-size:200% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:glow-sweep 3s ease-in-out infinite;transition:background-position .3s}
+    @keyframes glow-sweep{0%,100%{background-position:200% 0}50%{background-position:0% 0}}
+    .cta-phone:hover{-webkit-text-fill-color:var(--or);background:none;animation:none}
+    .cta-btns{display:flex;gap:14px;flex-wrap:wrap}
+    .btn-wh{display:inline-flex;align-items:center;gap:10px;background:var(--wh);color:var(--ink);padding:18px 36px;border-radius:999px;font-size:17px;font-weight:700;text-decoration:none;font-family:'Sarabun',sans-serif;position:relative;overflow:hidden;transition:transform .2s}
+    .btn-wh::before{content:'';position:absolute;inset:0;background:var(--or);transform:translateX(-101%);transition:transform .35s cubic-bezier(.16,1,.3,1)}
+    .btn-wh:hover{transform:scale(1.02)}
+    .btn-wh:hover::before{transform:translateX(0)}
+    .btn-wh span,.btn-wh svg{position:relative;z-index:1}
+    .btn-wh svg{width:22px;height:22px}
+    .btn-gh{display:inline-flex;align-items:center;gap:10px;background:transparent;color:var(--wh);border:2px solid rgba(255,255,255,.25);padding:18px 36px;border-radius:999px;font-size:17px;font-weight:700;text-decoration:none;font-family:'Sarabun',sans-serif;transition:all .2s}
+    .btn-gh:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.5)}
+    .btn-gh svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+    .cta-trust{margin-top:28px;font-size:13px;color:rgba(255,255,255,.3);letter-spacing:.04em}
+
+    /* ── FLOAT CTA ── */
+    .float-cta{position:fixed;bottom:28px;right:28px;z-index:700;display:flex;align-items:center;gap:10px;background:var(--or);color:var(--wh);padding:14px 22px;border-radius:999px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Sarabun',sans-serif;box-shadow:0 8px 30px rgba(255,92,26,.4);transform:translateY(100px);opacity:0;transition:transform .5s cubic-bezier(.16,1,.3,1),opacity .4s ease;will-change:transform}
+    .float-cta.show{transform:translateY(0);opacity:1}
+    .float-cta:hover{background:var(--ink);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+    .float-cta svg{width:16px;height:16px;fill:currentColor;flex-shrink:0}
+    @media(max-width:680px){.float-cta{bottom:16px;right:16px;padding:12px 18px;font-size:13px}}
+
+    /* ── FAQ ── */
+    .faq{padding:90px 0;border-top:1px solid var(--br);background:var(--bg)}
+    .faq-lbl{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--mu);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+    .faq-lbl::after{content:'';flex:1;height:1px;background:var(--br)}
+    .faq-h2{font-family:'Calistoga',serif;font-size:clamp(34px,5vw,58px);letter-spacing:-.025em;margin-bottom:48px}
+    .faq-list{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--br)}
+    .faq-item{border-bottom:1px solid var(--br)}
+    .faq-q{width:100%;background:none;border:none;padding:24px 0;display:flex;justify-content:space-between;align-items:center;font-family:'Sarabun',sans-serif;font-size:clamp(16px,1.8vw,20px);font-weight:700;color:var(--ink);cursor:none;text-align:left;gap:16px}
+    .faq-q svg{width:20px;height:20px;stroke:var(--or);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+    .faq-item.open .faq-q svg{transform:rotate(45deg)}
+    .faq-item.open .faq-q{color:var(--or)}
+    .faq-a{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.16,1,.3,1)}
+    .faq-a-inner{padding:0 0 24px;font-size:16px;color:var(--mu);line-height:1.85;max-width:680px}
+
+    /* ── FOOTER ── */
+    .footer{background:var(--ink);color:rgba(255,255,255,.6);padding:72px 0 36px;position:relative;overflow:hidden}
+    .footer-wm{position:absolute;bottom:-40px;left:-20px;font-family:'Calistoga',serif;font-size:clamp(100px,18vw,220px);color:rgba(255,255,255,.025);line-height:1;pointer-events:none;user-select:none;letter-spacing:-.05em;white-space:nowrap}
+    .footer-top{display:grid;grid-template-columns:2fr 1fr 1fr;gap:64px;padding-bottom:56px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:32px;position:relative;z-index:1}
+    .footer-logo{font-family:'Calistoga',serif;font-size:36px;color:var(--wh);letter-spacing:-.04em;margin-bottom:14px;line-height:1}
+    .footer-logo s{color:var(--or);text-decoration:none}
+    .footer-brand p{font-size:14px;line-height:1.85;max-width:260px}
+    .footer h5{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:18px}
+    .footer ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+    .footer ul a{color:rgba(255,255,255,.5);text-decoration:none;font-size:14px;transition:color .15s}
+    .footer ul a:hover{color:var(--wh)}
+    .footer-bot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;position:relative;z-index:1}
+    .footer-bot p,.footer-tag{font-size:12px;opacity:.3}
+    .footer-tag{font-style:italic}
+
+    /* ── REVEAL ── */
+    .rv{opacity:0;transform:translateY(26px);transition:opacity .75s ease,transform .75s ease}
+    .rv.in{opacity:1;transform:translateY(0)}
+    .rv.d1{transition-delay:.08s}.rv.d2{transition-delay:.16s}.rv.d3{transition-delay:.24s}.rv.d4{transition-delay:.32s}
+
+    @media(prefers-reduced-motion:reduce){
+      *,.mq-t,.hero-ticker-track,.hero-badge,.cta-phone{animation:none!important;transition:none!important}
+      .rv,.hero-hl .ln-i,.hero-hl .ln-i.hide,.manifesto-text .w{opacity:1;transform:none!important}
+    }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:1024px){
+      .c{padding:0 24px}
+      .nav{padding:18px 24px}
+      .hero-top,.hero-bottom{padding-left:24px;padding-right:24px}
+      .svc-layout{grid-template-columns:1fr}
+      .svc-tabs{display:flex;border-right:none;border-bottom:1px solid var(--br);overflow-x:auto;scrollbar-width:none}
+      .svc-tabs::-webkit-scrollbar{display:none}
+      .svc-tab{flex-shrink:0;border-left:none;border-bottom:none;flex-direction:column;align-items:flex-start;padding:14px 16px;border-right:1px solid var(--br);border-top:3px solid transparent}
+      .svc-tab:last-child{border-right:none}
+      .svc-tab.active{border-top-color:var(--or);border-left-color:transparent;background:var(--olt)}
+      .svc-preview-wrap{min-height:460px}
+      .footer-top{grid-template-columns:1fr 1fr}
+      .footer-brand{grid-column:span 2}
+      .about-cols{grid-template-columns:1fr;gap:24px}
+      .nav-ph{display:none}
+      .nav .nav-btn{display:none}
+      .ham{display:flex}
+    }
+    @media(max-width:680px){
+      .hero-bottom{grid-template-columns:1fr}
+      .hero-actions{align-items:flex-start}
+      .svc-header{flex-direction:column;align-items:flex-start}
+      .svc-header p{text-align:left}
+      .svc-preview-wrap{min-height:520px}
+      .svc-panel{padding:14px}
+      .footer-top{grid-template-columns:1fr}
+      .footer-brand{grid-column:auto}
+      .cta-btns{flex-direction:column;align-items:flex-start}
+      .btn-wh,.btn-gh{width:100%;max-width:300px;justify-content:center}
+      .footer-bot{flex-direction:column;text-align:center}
+      .manifesto-foot{flex-direction:column;align-items:flex-start;gap:16px}
+    }
+  </style>
+</head>
+<body>
+
+<div id="prog"></div>
+<div id="load"><div id="load-txt">สกล<span>ไท</span></div></div>
+<div id="cr">
+  <svg viewBox="-1.5 -1.5 20 24" xmlns="http://www.w3.org/2000/svg">
+    <!-- filled body -->
+    <path class="arr-fill" d="M0 0 L0 17 L4.5 13 L7.5 20.5 L10.5 19 L7.5 11.5 L13 11.5 Z"/>
+    <!-- outline stroke on top -->
+    <path class="arr-stroke" d="M0 0 L0 17 L4.5 13 L7.5 20.5 L10.5 19 L7.5 11.5 L13 11.5 Z"/>
+  </svg>
+</div>
+
+<!-- SIDE NAV -->
+<nav class="side-nav" id="sideNav" aria-label="Section navigation">
+  <span class="sn-dot" data-section="home" data-label="หน้าแรก"></span>
+  <span class="sn-dot" data-section="services" data-label="บริการ"></span>
+  <span class="sn-dot" data-section="contact" data-label="ติดต่อ"></span>
+</nav>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo">สกล<s>ไท</s></a>
+  <div class="nav-r">
+    <a href="tel:0800000000" class="nav-ph">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8 9.91a16 16 0 0 0 6 6l.92-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.9 17z"/></svg>
+      080-000-0000
+    </a>
+    <a href="#contact" class="nav-btn">ติดต่อเรา</a>
+    <button class="ham" id="ham" aria-label="เปิดเมนู" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="mm" id="mm" role="dialog" aria-modal="true">
+  <button class="mm-x" id="mmx" aria-label="ปิดเมนู">×</button>
+  <a href="#services">บริการ</a>
+  <a href="#contact">ติดต่อ</a>
+  <p class="mm-sub">080-000-0000 · LINE @sakonthaisoft</p>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg-num" id="heroBgNum" aria-hidden="true">SK</div>
+  <div class="hero-top">
+    <div class="hero-eye">ดูแลจริง · ส่งตรงเวลา · ราคาโปร่งใส</div>
+    <h1 class="hero-hl" aria-label="รับเขียนโปรแกรม ทุกรูปแบบ">
+      <span class="ln big"><span class="ln-i">รับเขียน</span></span>
+      <span class="ln ital"><span class="ln-i">โปรแกรม</span></span>
+      <span class="ln out"><span class="ln-i">ทุกรูปแบบ</span></span>
+    </h1>
+
+    <!-- rotating badge -->
+    <div class="hero-badge" aria-hidden="true">
+      <svg viewBox="0 0 130 130" width="130" height="130">
+        <defs><path id="circ" d="M65,65 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0"/></defs>
+        <text><textPath href="#circ" startOffset="0%">สกลไท · Software · พัฒนาโปรแกรม · </textPath></text>
+      </svg>
+      <div class="hero-badge-dot">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-ticker" aria-hidden="true">
+    <div class="hero-ticker-track">
+      <span class="hero-ticker-item"><span class="dot">●</span>ปรึกษาฟรี</span>
+      <span class="hero-ticker-item"><span class="dot">●</span>ดูแลหลังขายตลอด</span>
+      <span class="hero-ticker-item"><span class="dot">●</span>ส่งงานตรงเวลา</span>
+      <span class="hero-ticker-item"><span class="dot">●</span>ราคาโปร่งใส</span>
+      <span class="hero-ticker-item"><span class="dot">●</span>วิเคราะห์ปัญหาก่อนลงมือ</span>
+      <span class="hero-ticker-item"><span class="dot">●</span>เข้าใจบริบทองค์กร</span>
+      <span class="hero-ticker-item"><span class="dot">●</span>ปรึกษาฟรี</span>
+      <span class="hero-ticker-item"><span class="dot">●</span>ดูแลหลังขายตลอด</span>
+      <span class="hero-ticker-item"><span class="dot">●</span>ส่งงานตรงเวลา</span>
+      <span class="hero-ticker-item"><span class="dot">●</span>ราคาโปร่งใส</span>
+      <span class="hero-ticker-item"><span class="dot">●</span>วิเคราะห์ปัญหาก่อนลงมือ</span>
+      <span class="hero-ticker-item"><span class="dot">●</span>เข้าใจบริบทองค์กร</span>
+    </div>
+  </div>
+  <div class="hero-bottom">
+    <p class="hero-desc rv">CRM, ERP, ระบบร้านอาหาร และอีกมากมาย ราคาโปร่งใส ดูแลตลอดอายุการใช้งาน</p>
+    <div class="hero-actions rv d1">
+      <a href="#contact" class="btn-or">
+        <span>ปรึกษาฟรีวันนี้</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+      <span class="hero-note">ไม่มีค่าใช้จ่าย · ไม่บังคับซื้อ</span>
+    </div>
+  </div>
+
+  <div class="hero-scroll-hint" aria-hidden="true">
+    <div class="hero-scroll-hint-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="mq" aria-hidden="true">
+  <div class="mq-row"><div class="mq-t fw">
+    <div class="mq-i">ระบบ CRM <span class="d">●</span></div><div class="mq-i">ระบบ ERP <span class="d">●</span></div><div class="mq-i">ร้านอาหาร POS <span class="d">●</span></div><div class="mq-i">สต๊อกสินค้า <span class="d">●</span></div><div class="mq-i">นัดหมายออนไลน์ <span class="d">●</span></div><div class="mq-i">แอปมือถือ <span class="d">●</span></div><div class="mq-i">ระบบบัญชี <span class="d">●</span></div><div class="mq-i">Dashboard <span class="d">●</span></div>
+    <div class="mq-i">ระบบ CRM <span class="d">●</span></div><div class="mq-i">ระบบ ERP <span class="d">●</span></div><div class="mq-i">ร้านอาหาร POS <span class="d">●</span></div><div class="mq-i">สต๊อกสินค้า <span class="d">●</span></div><div class="mq-i">นัดหมายออนไลน์ <span class="d">●</span></div><div class="mq-i">แอปมือถือ <span class="d">●</span></div><div class="mq-i">ระบบบัญชี <span class="d">●</span></div><div class="mq-i">Dashboard <span class="d">●</span></div>
+  </div></div>
+  <div class="mq-row or"><div class="mq-t rv">
+    <div class="mq-i">เข้าใจปัญหา <span class="d">●</span></div><div class="mq-i">ราคาโปร่งใส <span class="d">●</span></div><div class="mq-i">ดูแลตลอด <span class="d">●</span></div><div class="mq-i">ส่งตรงเวลา <span class="d">●</span></div><div class="mq-i">บริบทองค์กร <span class="d">●</span></div><div class="mq-i">ปรึกษาฟรี <span class="d">●</span></div><div class="mq-i">แก้ที่ต้นเหตุ <span class="d">●</span></div>
+    <div class="mq-i">เข้าใจปัญหา <span class="d">●</span></div><div class="mq-i">ราคาโปร่งใส <span class="d">●</span></div><div class="mq-i">ดูแลตลอด <span class="d">●</span></div><div class="mq-i">ส่งตรงเวลา <span class="d">●</span></div><div class="mq-i">บริบทองค์กร <span class="d">●</span></div><div class="mq-i">ปรึกษาฟรี <span class="d">●</span></div><div class="mq-i">แก้ที่ต้นเหตุ <span class="d">●</span></div>
+  </div></div>
+</div>
+
+<!-- MANIFESTO -->
+<section class="manifesto" id="manifesto-sec">
+  <div class="c">
+    <div class="manifesto-inner">
+      <p class="manifesto-label rv">ปรัชญาของเรา</p>
+      <p class="manifesto-text rv d1" id="manifestoText">"ซอฟต์แวร์ที่ดีไม่ได้มาจากการเขียนโค้ดเก่ง — มาจากการ<em>เข้าใจปัญหาและบริบทของธุรกิจ</em>ได้อย่างลึกซึ้ง"</p>
+      <div class="manifesto-foot rv d2">
+        <span class="mf-item">ราคาโปร่งใส</span>
+        <span class="mf-item">ส่งตรงเวลา</span>
+        <span class="mf-item">ดูแลตลอดอายุการใช้งาน</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES BENTO -->
+<div class="stats" aria-label="แนวทางของเรา">
+  <div class="stat-band featured rv">
+    <div class="stat-n">01</div>
+    <div class="stat-nm">เข้าใจปัญหาก่อนเขียนโค้ด</div>
+    <div class="stat-txt">สิ่งที่ลูกค้าบอกว่าต้องการกับสิ่งที่ธุรกิจต้องการจริงๆ มักไม่เหมือนกัน เราวิเคราะห์ให้ถึงราก</div>
+  </div>
+  <div class="stat-band rv d1">
+    <div class="stat-n">02</div>
+    <div class="stat-nm">คิดแบบ<br/>เจ้าของธุรกิจ</div>
+    <div class="stat-txt">ทุก feature ที่สร้างต้องตอบได้ว่า "มันช่วยธุรกิจยังไง" ไม่ใช่แค่ทำตาม spec</div>
+  </div>
+  <div class="stat-band rv d2">
+    <div class="stat-n">03</div>
+    <div class="stat-nm">เข้าใจบริบทองค์กร</div>
+    <div class="stat-txt">กระบวนการ ทีม และวัฒนธรรมของแต่ละองค์กรแตกต่างกัน ระบบต้องเข้ากับคนจริงๆ</div>
+  </div>
+  <div class="stat-band rv d3">
+    <div class="stat-n">04</div>
+    <div class="stat-nm">พัฒนาไปพร้อมธุรกิจ</div>
+    <div class="stat-txt">ส่งงานไม่ใช่จุดสิ้นสุด ซอฟต์แวร์ที่ดีเติบโตและปรับตัวไปตามธุรกิจที่เปลี่ยน</div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="c">
+    <div class="svc-header">
+      <h2 class="rv">บริการของเรา</h2>
+      <p class="rv d1">คลิกที่บริการ<br/>เพื่อดูตัวอย่างระบบจริง</p>
+    </div>
+    <div class="svc-layout rv d2">
+      <!-- TABS -->
+      <div class="svc-tabs">
+        <div class="svc-tab active" data-panel="p-crm">
+          <div class="svc-tab-n">01</div>
+          <div><div class="svc-tab-nm">ระบบ CRM</div><div class="svc-tab-d">ติดตามลูกค้า · วิเคราะห์การขาย</div></div>
+        </div>
+        <div class="svc-tab" data-panel="p-erp">
+          <div class="svc-tab-n">02</div>
+          <div><div class="svc-tab-nm">ระบบ ERP</div><div class="svc-tab-d">บัญชี · คลัง · HR</div></div>
+        </div>
+        <div class="svc-tab" data-panel="p-pos">
+          <div class="svc-tab-n">03</div>
+          <div><div class="svc-tab-nm">ระบบร้านอาหาร</div><div class="svc-tab-d">QR ออเดอร์ · POS · ส่งครัว</div></div>
+        </div>
+        <div class="svc-tab" data-panel="p-shop">
+          <div class="svc-tab-n">04</div>
+          <div><div class="svc-tab-nm">ระบบขายสินค้า</div><div class="svc-tab-d">ออนไลน์ · ออฟไลน์ · Marketplace</div></div>
+        </div>
+        <div class="svc-tab" data-panel="p-book">
+          <div class="svc-tab-n">05</div>
+          <div><div class="svc-tab-nm">ระบบนัดหมาย</div><div class="svc-tab-d">จองออนไลน์ · แจ้งเตือน LINE</div></div>
+        </div>
+        <div class="svc-tab" data-panel="p-custom">
+          <div class="svc-tab-n">06</div>
+          <div><div class="svc-tab-nm">โปรแกรมสั่งทำ</div><div class="svc-tab-d">ตามสเปก · ไม่จำกัดรูปแบบ</div></div>
+        </div>
+      </div>
+      <!-- PREVIEW PANELS -->
+      <div class="svc-preview-wrap">
+        <!-- CRM -->
+        <div class="svc-panel active" id="p-crm">
+          <div class="sc-card">
+            <div class="sc-bar"><div class="sc-dots"><span></span><span></span><span></span></div><span class="sc-title">ระบบ CRM ติดตามการขาย</span></div>
+            <div class="sc-body">
+              <div class="crm-stats">
+                <div class="crm-stat"><div class="v">47</div><div class="l">ลูกค้าใหม่</div></div>
+                <div class="crm-stat"><div class="v" style="color:var(--or)">฿1.2M</div><div class="l">ยอดขาย</div></div>
+                <div class="crm-stat"><div class="v">89%</div><div class="l">ปิดได้</div></div>
+              </div>
+              <div class="crm-bar-wrap">
+                <div class="crm-br"><div class="crm-br-top"><span>ยอดขาย</span><span style="color:var(--or)">85%</span></div><div class="crm-br-track"><div class="crm-br-fill" style="width:85%;background:var(--or)"></div></div></div>
+                <div class="crm-br"><div class="crm-br-top"><span>ลูกค้าใหม่</span><span style="color:var(--ink)">72%</span></div><div class="crm-br-track"><div class="crm-br-fill" style="width:72%;background:var(--ink)"></div></div></div>
+                <div class="crm-br"><div class="crm-br-top"><span>ติดตาม</span><span style="color:#7C3AED">60%</span></div><div class="crm-br-track"><div class="crm-br-fill" style="width:60%;background:#7C3AED"></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ERP -->
+        <div class="svc-panel" id="p-erp">
+          <div class="sc-card">
+            <div class="sc-bar"><div class="sc-dots"><span></span><span></span><span></span></div><span class="sc-title">ระบบสต๊อก / ERP</span></div>
+            <div class="sc-body">
+              <div style="font-size:13px;font-weight:700;color:var(--mu);margin-bottom:12px;letter-spacing:.04em;text-transform:uppercase">สถานะสต๊อกสินค้า</div>
+              <div class="erp-list">
+                <div class="erp-hd"><span>สินค้า</span><span>คงเหลือ</span><span>สถานะ</span></div>
+                <div class="erp-row"><span>กาแฟดำ</span><div class="erp-bar-sm"><div class="erp-fill" style="width:80%;background:#22c55e"></div></div><span style="color:#22c55e;font-size:12px;font-weight:700">ปกติ</span></div>
+                <div class="erp-row"><span>น้ำตาล</span><div class="erp-bar-sm"><div class="erp-fill" style="width:58%;background:var(--or)"></div></div><span style="color:var(--or);font-size:12px;font-weight:700">กลาง</span></div>
+                <div class="erp-row"><span>นมข้น</span><div class="erp-bar-sm"><div class="erp-fill" style="width:18%;background:#ef4444"></div></div><span class="warn">⚠ ต่ำ</span></div>
+                <div class="erp-row"><span>ไอศครีม</span><div class="erp-bar-sm"><div class="erp-fill" style="width:92%;background:#22c55e"></div></div><span style="color:#22c55e;font-size:12px;font-weight:700">ปกติ</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- POS -->
+        <div class="svc-panel" id="p-pos">
+          <div class="sc-card">
+            <div class="sc-bar"><div class="sc-dots"><span></span><span></span><span></span></div><span class="sc-title">ระบบร้านอาหาร POS</span></div>
+            <div class="sc-body">
+              <div class="pos-tables">
+                <div class="pos-tbl act">โต๊ะ 1<br/><small style="opacity:.7">3 รายการ</small></div>
+                <div class="pos-tbl">โต๊ะ 2<br/><small style="opacity:.5">ว่าง</small></div>
+                <div class="pos-tbl">โต๊ะ 3<br/><small style="opacity:.5">ว่าง</small></div>
+                <div class="pos-tbl">โต๊ะ 4<br/><small style="opacity:.5">ว่าง</small></div>
+                <div class="pos-tbl act">โต๊ะ 5<br/><small style="opacity:.7">2 รายการ</small></div>
+                <div class="pos-tbl">โต๊ะ 6<br/><small style="opacity:.5">ว่าง</small></div>
+              </div>
+              <div class="pos-items">
+                <div class="pos-item"><span>ต้มยำกุ้ง ×2</span><span>฿240</span></div>
+                <div class="pos-item"><span>ผัดไทย ×1</span><span>฿80</span></div>
+                <div class="pos-item"><span>น้ำเปล่า ×2</span><span>฿20</span></div>
+                <div class="pos-item"><strong>รวมทั้งหมด</strong><strong style="color:var(--or)">฿340</strong></div>
+              </div>
+              <button class="pos-pay">ชำระเงิน →</button>
+            </div>
+          </div>
+        </div>
+        <!-- SHOP -->
+        <div class="svc-panel" id="p-shop">
+          <div class="sc-card">
+            <div class="sc-bar"><div class="sc-dots"><span></span><span></span><span></span></div><span class="sc-title">ระบบขายสินค้าออนไลน์</span></div>
+            <div class="sc-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+                <div style="background:var(--bg);border-radius:8px;padding:10px">
+                  <div style="height:48px;background:linear-gradient(135deg,rgba(255,92,26,.15),var(--olt));border-radius:6px;margin-bottom:8px"></div>
+                  <div style="font-size:12px;font-weight:700">เสื้อยืด basic</div>
+                  <div style="font-size:13px;color:var(--or);font-weight:700">฿199</div>
+                  <div style="font-size:11px;color:var(--mu)">สต๊อก: 24 ชิ้น</div>
+                </div>
+                <div style="background:var(--bg);border-radius:8px;padding:10px">
+                  <div style="height:48px;background:linear-gradient(135deg,rgba(124,58,237,.1),#EDE9FE);border-radius:6px;margin-bottom:8px"></div>
+                  <div style="font-size:12px;font-weight:700">กางเกงขายาว</div>
+                  <div style="font-size:13px;color:var(--ink);font-weight:700">฿390</div>
+                  <div style="font-size:11px;color:var(--mu)">สต๊อก: 11 ชิ้น</div>
+                </div>
+              </div>
+              <div style="background:var(--bg);border-radius:8px;padding:12px">
+                <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-bottom:8px">คำสั่งซื้อล่าสุด</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--br);font-size:12px"><span>#1042 คุณสมชาย</span><span style="background:#22c55e;color:var(--wh);padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700">จัดส่งแล้ว</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--br);font-size:12px"><span>#1043 คุณมาลี</span><span style="background:var(--or);color:var(--wh);padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700">กำลังแพ็ค</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:12px"><span>#1044 คุณวิไล</span><span style="background:var(--br);color:var(--mu);padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700">รอชำระ</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- BOOKING -->
+        <div class="svc-panel" id="p-book">
+          <div class="sc-card">
+            <div class="sc-bar"><div class="sc-dots"><span></span><span></span><span></span></div><span class="sc-title">ระบบนัดหมาย / จอง</span></div>
+            <div class="sc-body">
+              <div style="font-size:13px;font-weight:700;margin-bottom:14px">พฤหัสบดี 23 มกราคม</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="background:var(--or);border-radius:8px;padding:10px 14px;color:var(--wh)"><div style="font-size:13px;font-weight:700">09:00 — คุณสมชาย</div><div style="font-size:12px;opacity:.8">นวดไทย 60 นาที</div></div>
+                <div style="background:var(--ink);border-radius:8px;padding:10px 14px;color:var(--wh)"><div style="font-size:13px;font-weight:700">10:30 — คุณมาลี</div><div style="font-size:12px;opacity:.6">สปาหน้า 45 นาที</div></div>
+                <div style="background:var(--bg);border:1px dashed var(--br);border-radius:8px;padding:10px 14px"><div style="font-size:13px;font-weight:700;color:var(--mu)">12:00 — ว่าง</div><div style="font-size:12px;color:var(--mu)">+ รับจอง</div></div>
+                <div style="background:#EDE9FE;border-radius:8px;padding:10px 14px"><div style="font-size:13px;font-weight:700;color:#7C3AED">14:00 — คุณวิไล</div><div style="font-size:12px;color:#7C3AED;opacity:.8">ทำผม 90 นาที</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- CUSTOM -->
+        <div class="svc-panel" id="p-custom">
+          <div class="sc-card">
+            <div class="sc-bar"><div class="sc-dots"><span></span><span></span><span></span></div><span class="sc-title">โปรแกรมสั่งทำ — HRM System</span></div>
+            <div class="sc-body">
+              <div style="font-size:13px;font-weight:700;margin-bottom:14px">Roadmap การพัฒนา</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="background:var(--or);border-radius:8px;padding:12px 14px">
+                  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.7);margin-bottom:4px">SPRINT 1 — เสร็จแล้ว ✓</div>
+                  <div style="font-size:13px;color:var(--wh);font-weight:600">ระบบ Login & สิทธิ์ผู้ใช้</div>
+                </div>
+                <div style="background:var(--ink);border-radius:8px;padding:12px 14px">
+                  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.4);margin-bottom:4px">SPRINT 2 — กำลังพัฒนา</div>
+                  <div style="font-size:13px;color:var(--wh);font-weight:600">โมดูล Leave & ลาหยุด</div>
+                  <div style="background:rgba(255,255,255,.08);border-radius:4px;height:4px;margin-top:10px"><div style="width:65%;height:100%;background:var(--or);border-radius:4px"></div></div>
+                  <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:6px">65% เสร็จแล้ว</div>
+                </div>
+                <div style="background:var(--bg);border:1px dashed var(--br);border-radius:8px;padding:12px 14px">
+                  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:4px">SPRINT 3 — รอคิว</div>
+                  <div style="font-size:13px;color:var(--mu);font-weight:600">Dashboard & รายงาน</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about">
+  <div class="c">
+    <p class="about-lbl rv">เกี่ยวกับเรา</p>
+    <p class="about-stmt rv d1">"เราไม่ได้แค่เขียนโค้ด — เราฟัง วิเคราะห์ แล้วสร้าง<em>ระบบที่ตอบโจทย์จริงๆ</em> ไม่ใช่แค่ส่งงานให้เสร็จ"</p>
+  </div>
+</section>
+
+
+
+
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="c">
+    <p class="faq-lbl rv">คำถามที่พบบ่อย</p>
+    <h2 class="faq-h2 rv d1">ถามมา ตอบได้หมด</h2>
+    <div class="faq-list rv d2">
+      <div class="faq-item">
+        <button class="faq-q">ราคาเริ่มต้นเท่าไหร่? <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        <div class="faq-a"><div class="faq-a-inner">ขึ้นอยู่กับขนาดและความซับซ้อนของระบบ โดยทั่วไปเริ่มต้นตั้งแต่หลักหมื่นถึงหลักแสน เราจะเสนอราคาหลังจากฟังความต้องการจริงๆ ก่อนเสมอ ไม่มีค่าปรึกษา</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">ใช้เวลาพัฒนานานแค่ไหน? <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        <div class="faq-a"><div class="faq-a-inner">ระบบขนาดเล็ก–กลาง เช่น POS หรือ CRM พื้นฐาน ใช้เวลาประมาณ 4–8 สัปดาห์ ระบบ ERP หรือ Custom ขนาดใหญ่อาจใช้ 3–6 เดือน เราอัปเดตความคืบหน้าทุกสัปดาห์</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">หลังส่งงานแล้วดูแลยังไง? <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        <div class="faq-a"><div class="faq-a-inner">ดูแลตลอดอายุการใช้งาน แก้บั๊กฟรีหลังส่งงาน 3 เดือน จากนั้นมีแพ็คเกจดูแลรายปีในราคาที่เป็นธรรม โทรหาเราได้ตลอด ไม่มีกั้น</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">ต้องการโปรแกรมเฉพาะทาง ทำได้ไหม? <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        <div class="faq-a"><div class="faq-a-inner">ได้ทุกรูปแบบ ทั้ง Web App, Mobile App (iOS/Android), และระบบ Backend ที่ซับซ้อน บอกสเปกมาได้เลย เราวิเคราะห์ให้ฟรี</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">ชำระเงินอย่างไร? <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        <div class="faq-a"><div class="faq-a-inner">แบ่งจ่ายตามงวด โดยทั่วไปคือ 30% เริ่มงาน · 40% ระหว่างพัฒนา · 30% หลังส่งมอบ รับโอนธนาคาร PromptPay ทุกช่องทาง</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOAT CTA -->
+<a href="#contact" class="float-cta" id="floatCta" aria-label="ติดต่อเรา">
+  <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8 9.91a16 16 0 0 0 6 6l.92-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.9 17z"/></svg>
+  ปรึกษาฟรี
+</a>
+
+<!-- CTA -->
+<section class="cta" id="contact">
+  <div class="cta-ring r1" aria-hidden="true"></div>
+  <div class="cta-ring r2" aria-hidden="true"></div>
+  <div class="c cta-inner">
+    <p class="cta-lbl rv">พร้อมเริ่มต้นแล้วหรือยัง?</p>
+    <h2 class="cta-h rv d1">พร้อมเริ่มแล้ว<br/><em>คุยกันเลย</em></h2>
+    <a href="tel:0800000000" class="cta-phone rv d2" aria-label="โทร 080-000-0000">080-000-0000</a>
+    <div class="cta-btns rv d3">
+      <a href="https://line.me/ti/p/~@sakonthaisoft" class="btn-wh" aria-label="แอด LINE">
+        <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" style="width:22px;height:22px" aria-hidden="true"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+        <span>แอด LINE คุยเลย</span>
+      </a>
+      <a href="tel:0800000000" class="btn-gh" aria-label="โทรหาเรา">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8 9.91a16 16 0 0 0 6 6l.92-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.9 17z"/></svg>
+        080-000-0000
+      </a>
+    </div>
+    <p class="cta-trust rv">ตอบกลับภายใน 24 ชม. · ปรึกษาฟรี · ไม่บังคับซื้อ</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-wm" aria-hidden="true">สกลไท</div>
+  <div class="c">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">สกล<s>ไท</s></div>
+        <p>รับพัฒนาซอฟต์แวร์ทุกรูปแบบ ราคาโปร่งใส ส่งตรงเวลา ดูแลตั้งแต่วันแรกถึงวันสุดท้าย</p>
+      </div>
+      <div>
+        <h5>บริการ</h5>
+        <ul><li><a href="#services">CRM</a></li><li><a href="#services">ERP</a></li><li><a href="#services">ร้านอาหาร</a></li><li><a href="#services">ขายสินค้า</a></li><li><a href="#services">นัดหมาย</a></li><li><a href="#services">Custom</a></li></ul>
+      </div>
+      <div>
+        <h5>ติดต่อ</h5>
+        <ul><li><a href="tel:0800000000">080-000-0000</a></li><li><a href="https://line.me/ti/p/~@sakonthaisoft">LINE @sakonthaisoft</a></li><li><a href="mailto:hello@sakonthai.com">hello@sakonthai.com</a></li></ul>
+        <h5 style="margin-top:24px">เวลาทำการ</h5>
+        <ul><li><a href="#">จ–ศ 8:00–18:00</a></li><li><a href="#">ส 9:00–14:00</a></li></ul>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <p>© 2024 สกลไท. สงวนลิขสิทธิ์.</p>
+      <p class="footer-tag">เขียนโปรแกรมด้วยหัวใจ ส่งมอบด้วยความรับผิดชอบ</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // LOADER
+  const load=document.getElementById('load');
+  setTimeout(()=>load.classList.add('go'),60);
+  setTimeout(()=>load.classList.add('out'),860);
+
+  // PROGRESS
+  const prog=document.getElementById('prog');
+  window.addEventListener('scroll',()=>{
+    prog.style.transform=`scaleX(${scrollY/(document.body.scrollHeight-innerHeight)})`;
+  },{passive:true});
+
+  // CURSOR — arrow snaps to hotspot (tip = top-left of SVG)
+  const cr=document.getElementById('cr');
+  if(cr&&window.matchMedia('(hover:hover)').matches){
+    document.addEventListener('mousemove',e=>{
+      cr.style.transform=`translate(${e.clientX}px,${e.clientY}px)`;
+    });
+    const addBig=()=>cr.classList.add('big');
+    const rmBig=()=>cr.classList.remove('big');
+    document.querySelectorAll('a,button,.svc-tab,.faq-q').forEach(el=>{
+      el.addEventListener('mouseenter',addBig);
+      el.addEventListener('mouseleave',rmBig);
+    });
+    const addInv=()=>cr.classList.add('inv');
+    const rmInv=()=>cr.classList.remove('inv');
+    document.querySelectorAll('.comp,.mq,.mm,.cta,.footer').forEach(el=>{
+      el.addEventListener('mouseenter',addInv);
+      el.addEventListener('mouseleave',rmInv);
+    });
+  }
+
+  // NAV scroll
+  const nav=document.getElementById('nav');
+  window.addEventListener('scroll',()=>nav.classList.toggle('on',scrollY>40),{passive:true});
+
+  // MOBILE MENU
+  const ham=document.getElementById('ham'),mm=document.getElementById('mm'),mmx=document.getElementById('mmx');
+  const open=()=>{mm.classList.add('on');ham.setAttribute('aria-expanded',true);document.body.style.overflow='hidden'};
+  const close=()=>{mm.classList.remove('on');ham.setAttribute('aria-expanded',false);document.body.style.overflow=''};
+  ham.addEventListener('click',open);mmx.addEventListener('click',close);
+  mm.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));
+
+  // REVEAL
+  const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.1,rootMargin:'0px 0px -24px 0px'});
+  document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+  // HERO LINES — hide first, reveal after loader
+  const lns=document.querySelectorAll('.hero-hl .ln-i');
+  lns.forEach(l=>l.classList.add('hide'));
+  setTimeout(()=>{lns.forEach((l,i)=>setTimeout(()=>l.classList.remove('hide'),i*160))},920);
+
+  // HERO PARALLAX — scroll + mouse combined
+  const bgNum=document.getElementById('heroBgNum');
+  const heroHl=document.querySelector('.hero-hl');
+  let scrollOff=0,mpx=0,mpy=0;
+  if(bgNum){
+    window.addEventListener('scroll',()=>{
+      scrollOff=scrollY*.18;
+      bgNum.style.transform=`translateY(calc(-55% + ${scrollOff}px)) translate(${mpx}px,${mpy}px)`;
+    },{passive:true});
+    if(window.matchMedia('(hover:hover)').matches){
+      document.addEventListener('mousemove',e=>{
+        const hero=document.getElementById('home');
+        if(!hero||hero.getBoundingClientRect().bottom<0)return;
+        const x=(e.clientX/innerWidth-.5);
+        const y=(e.clientY/innerHeight-.5);
+        mpx=x*22;mpy=y*14;
+        bgNum.style.transform=`translateY(calc(-55% + ${scrollOff}px)) translate(${mpx}px,${mpy}px)`;
+        if(heroHl)heroHl.style.transform=`translate(${x*-6}px,${y*-4}px)`;
+      });
+    }
+  }
+
+
+  // MANIFESTO WORD SPLIT
+  const mt=document.getElementById('manifestoText');
+  if(mt){
+    const parts=mt.innerHTML.split(/(<em>.*?<\/em>)/g);
+    mt.innerHTML='';
+    let delay=0;
+    parts.forEach(part=>{
+      const emMatch=part.match(/^<em>(.*?)<\/em>$/);
+      const text=emMatch?emMatch[1]:part;
+      text.split(/(\s+)/).forEach(tok=>{
+        if(/^\s+$/.test(tok)){mt.appendChild(document.createTextNode(' '));return}
+        if(!tok)return;
+        const s=document.createElement('span');
+        s.className='w'+(emMatch?' em-w':'');
+        s.textContent=tok;
+        s.style.transitionDelay=`${delay}ms`;
+        mt.appendChild(s);
+        mt.appendChild(document.createTextNode(' '));
+        delay+=55;
+      });
+    });
+    const mio=new IntersectionObserver(([e])=>{
+      if(e.isIntersecting){mt.classList.add('revealed');mio.disconnect()}
+    },{threshold:.25});
+    mio.observe(mt);
+  }
+
+  // SIDE NAV
+  const dots=document.querySelectorAll('.sn-dot');
+  const sections=['home','services','why','testimonials','process','contact'].filter(id=>document.getElementById(id));
+  const darkSections=['comp','cta','footer'];
+  const updateSideNav=()=>{
+    let current='home';
+    sections.forEach(id=>{
+      const el=document.getElementById(id);
+      if(el&&el.getBoundingClientRect().top<=innerHeight/2)current=id;
+    });
+    dots.forEach(d=>{
+      d.classList.toggle('active',d.dataset.section===current);
+    });
+    // dark section detection
+    const isDark=['why','contact'].includes(current);
+    dots.forEach(d=>d.classList.toggle('dark-section',isDark));
+  };
+  window.addEventListener('scroll',updateSideNav,{passive:true});
+  updateSideNav();
+  dots.forEach(d=>{
+    d.addEventListener('click',()=>{
+      const el=document.getElementById(d.dataset.section);
+      if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  });
+
+  // SERVICES TABS
+  const svcTabs=document.querySelectorAll('.svc-tab');
+  svcTabs.forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      const targetId=tab.dataset.panel;
+      const currentPanel=document.querySelector('.svc-panel.active');
+      const newPanel=document.getElementById(targetId);
+      if(!newPanel||currentPanel===newPanel)return;
+      svcTabs.forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+      currentPanel.classList.add('exit');
+      currentPanel.classList.remove('active');
+      setTimeout(()=>{
+        currentPanel.classList.remove('exit');
+        newPanel.classList.add('active');
+      },190);
+    });
+  });
+
+  // FAQ ACCORDION
+  document.querySelectorAll('.faq-q').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const item=btn.closest('.faq-item');
+      const isOpen=item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(o=>{
+        o.classList.remove('open');
+        o.querySelector('.faq-a').style.maxHeight='';
+      });
+      if(!isOpen){
+        item.classList.add('open');
+        item.querySelector('.faq-a').style.maxHeight=item.querySelector('.faq-a-inner').scrollHeight+'px';
+      }
+    });
+  });
+
+  // FLOATING CTA
+  const floatCta=document.getElementById('floatCta');
+  if(floatCta){
+    window.addEventListener('scroll',()=>{
+      floatCta.classList.toggle('show',scrollY>innerHeight*.6);
+    },{passive:true});
+  }
+
+  // SMOOTH SCROLL
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',e=>{const t=document.querySelector(a.getAttribute('href'));if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}});
+  });
+})();
+</script>
+</body>
+</html>
