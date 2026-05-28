@@ -3,18 +3,19 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="theme-color" content="#FF5C1A"/>
+  <meta name="theme-color" content="#0C1A3E"/>
   <title>สกลไท — รับเขียนโปรแกรม ทุกรูปแบบ</title>
   <meta name="description" content="สกลไท รับพัฒนาโปรแกรม CRM ERP ร้านอาหาร ราคาเป็นธรรม ทีมคนไทย ดูแลจริง"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Calistoga&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Calistoga&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#F5F0E8; --ink:#0D0D0D; --or:#FF5C1A;
-      --olt:#FFF0EA; --bk:#090909; --mu:#6B6560;
-      --br:#D5CFC5; --wh:#FDFBF8;
+      --bg:#F5F2EB; --ink:#0C1830; --or:#B8860B;
+      --olt:#F8F3E3; --bk:#06091A; --mu:#56678A;
+      --br:#C3C7D5; --wh:#F9FAFC;
+      --gold-hi:#D4AA3A; --navy-2:#0E2248;
     }
     html{scroll-behavior:smooth}
     body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;font-size:17px;line-height:1.65;cursor:none}
@@ -40,7 +41,7 @@
     #cr svg{width:100%;height:100%;display:block}
     #cr .arr-fill{fill:var(--or);transition:fill .2s}
     #cr .arr-stroke{fill:none;stroke:var(--wh);stroke-width:1.6;stroke-linejoin:round;transition:stroke .2s}
-    #cr.big{width:38px;height:38px;filter:drop-shadow(0 4px 14px rgba(255,92,26,.45))}
+    #cr.big{width:38px;height:38px;filter:drop-shadow(0 4px 14px rgba(184,134,11,.45))}
     #cr.inv .arr-fill{fill:var(--wh)}
     #cr.inv .arr-stroke{stroke:rgba(0,0,0,.4)}
     #cd{display:none}
@@ -137,22 +138,22 @@
     .mq:hover .mq-t{animation-play-state:paused}
     .mq-i{display:flex;align-items:center;gap:24px;padding:0 24px;white-space:nowrap;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
     .mq-t.fw .mq-i{color:rgba(255,255,255,.38)}
-    .mq-t.rv .mq-i{color:rgba(255,92,26,.55)}
+    .mq-t.rv .mq-i{color:rgba(184,134,11,.55)}
     .mq-row.or .mq-t .mq-i{color:rgba(0,0,0,.35)}
     .mq-i .d{font-size:14px;line-height:1}
 
     /* ── MANIFESTO ── */
-    .manifesto{background:var(--or);padding:90px 0;overflow:hidden;position:relative}
+    .manifesto{background:var(--bk);padding:100px 0;overflow:hidden;position:relative;border-top:1px solid rgba(184,134,11,.25)}
     .manifesto::before{content:'';position:absolute;top:-60%;right:-10%;width:500px;height:500px;border-radius:50%;background:rgba(255,255,255,.07);pointer-events:none}
     .manifesto-inner{position:relative;z-index:1}
     .manifesto-label{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:28px}
     .manifesto-text{font-family:'Calistoga',serif;font-size:clamp(28px,4.5vw,62px);line-height:1.2;letter-spacing:-.025em;color:var(--wh);max-width:900px}
     .manifesto-text .w{display:inline-block;opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease}
-    .manifesto-text .w.em-w{color:var(--ink)}
+    .manifesto-text .w.em-w{color:var(--gold-hi)}
     .manifesto-text.revealed .w{opacity:1;transform:translateY(0)}
     .manifesto-foot{display:flex;align-items:center;gap:32px;margin-top:44px;padding-top:32px;border-top:1px solid rgba(255,255,255,.2)}
     .mf-item{font-size:14px;font-weight:700;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:8px}
-    .mf-item::before{content:'✓';color:var(--ink);font-size:16px;font-weight:900}
+    .mf-item::before{content:'✓';color:var(--gold-hi);font-size:16px;font-weight:900}
 
     /* ── STATS BENTO ── */
     .stats{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:auto auto;gap:0}
@@ -193,7 +194,7 @@
     .svc-tabs{background:var(--wh);border-right:1px solid var(--br)}
     .svc-tab{display:flex;align-items:center;gap:14px;padding:18px 22px;cursor:none;border-left:3px solid transparent;transition:background .2s,border-color .15s;border-bottom:1px solid var(--br)}
     .svc-tab:last-child{border-bottom:none}
-    .svc-tab:hover{background:rgba(255,92,26,.04)}
+    .svc-tab:hover{background:rgba(184,134,11,.04)}
     .svc-tab.active{border-left-color:var(--or);background:var(--olt)}
     .svc-tab-n{font-family:'Calistoga',serif;font-size:22px;color:rgba(13,13,13,.1);line-height:1;flex-shrink:0;width:34px;transition:color .2s}
     .svc-tab.active .svc-tab-n,.svc-tab:hover .svc-tab-n{color:var(--or)}
@@ -252,7 +253,7 @@
 
     /* ── CTA ── */
     .cta{background:var(--bk);padding:110px 0;position:relative;overflow:hidden}
-    .cta-ring{position:absolute;border-radius:50%;border:1px solid rgba(255,92,26,.15);pointer-events:none}
+    .cta-ring{position:absolute;border-radius:50%;border:1px solid rgba(184,134,11,.15);pointer-events:none}
     .cta-ring.r1{width:600px;height:600px;top:-200px;right:-150px}
     .cta-ring.r2{width:900px;height:900px;top:-350px;right:-350px}
     .cta-inner{position:relative;z-index:1}
@@ -260,7 +261,7 @@
     .cta-lbl::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08)}
     .cta-h{font-family:'Calistoga',serif;font-size:clamp(48px,8vw,108px);color:var(--wh);line-height:.95;letter-spacing:-.04em;margin-bottom:0}
     .cta-h em{font-style:italic;color:var(--or)}
-    .cta-phone{font-family:'Calistoga',serif;font-size:clamp(36px,5.5vw,72px);letter-spacing:-.03em;margin:20px 0 40px;line-height:1;display:block;text-decoration:none;background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,92,26,.35),rgba(255,255,255,.12));background-size:200% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:glow-sweep 3s ease-in-out infinite;transition:background-position .3s}
+    .cta-phone{font-family:'Calistoga',serif;font-size:clamp(36px,5.5vw,72px);letter-spacing:-.03em;margin:20px 0 40px;line-height:1;display:block;text-decoration:none;background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(184,134,11,.35),rgba(255,255,255,.12));background-size:200% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:glow-sweep 3s ease-in-out infinite;transition:background-position .3s}
     @keyframes glow-sweep{0%,100%{background-position:200% 0}50%{background-position:0% 0}}
     .cta-phone:hover{-webkit-text-fill-color:var(--or);background:none;animation:none}
     .cta-btns{display:flex;gap:14px;flex-wrap:wrap}
@@ -276,7 +277,7 @@
     .cta-trust{margin-top:28px;font-size:13px;color:rgba(255,255,255,.3);letter-spacing:.04em}
 
     /* ── FLOAT CTA ── */
-    .float-cta{position:fixed;bottom:28px;right:28px;z-index:700;display:flex;align-items:center;gap:10px;background:var(--or);color:var(--wh);padding:14px 22px;border-radius:999px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Sarabun',sans-serif;box-shadow:0 8px 30px rgba(255,92,26,.4);transform:translateY(100px);opacity:0;transition:transform .5s cubic-bezier(.16,1,.3,1),opacity .4s ease;will-change:transform}
+    .float-cta{position:fixed;bottom:28px;right:28px;z-index:700;display:flex;align-items:center;gap:10px;background:var(--or);color:var(--wh);padding:14px 22px;border-radius:999px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Sarabun',sans-serif;box-shadow:0 8px 30px rgba(184,134,11,.4);transform:translateY(100px);opacity:0;transition:transform .5s cubic-bezier(.16,1,.3,1),opacity .4s ease;will-change:transform}
     .float-cta.show{transform:translateY(0);opacity:1}
     .float-cta:hover{background:var(--ink);box-shadow:0 8px 30px rgba(0,0,0,.3)}
     .float-cta svg{width:16px;height:16px;fill:currentColor;flex-shrink:0}
@@ -354,6 +355,90 @@
       .footer-bot{flex-direction:column;text-align:center}
       .manifesto-foot{flex-direction:column;align-items:flex-start;gap:16px}
     }
+
+    /* ══ LUXURY DESIGN SYSTEM ══════════════════════════════════════════════ */
+
+    /* Playfair Display — editorial luxury headings */
+    .hero-hl,.manifesto-text,.about-stmt,.cta-h,.cta-phone,.faq-h2{font-family:'Playfair Display',serif}
+    .svc-header h2{font-family:'Playfair Display',serif}
+
+    /* Gold shimmer CTA button */
+    .btn-or{
+      background:linear-gradient(110deg,#7A5A08 0%,var(--gold-hi) 48%,#7A5A08 100%);
+      background-size:220% auto;
+      color:var(--bk);
+      box-shadow:0 4px 20px rgba(184,134,11,.25);
+    }
+    .btn-or::before{background:var(--ink)}
+    .btn-or:hover{color:var(--wh);box-shadow:0 6px 28px rgba(12,24,48,.4)}
+
+    /* Nav CTA pill — gold accent */
+    .nav-btn{background:var(--gold-hi);color:var(--bk);letter-spacing:.01em}
+    .nav-btn:hover{background:var(--ink);color:var(--wh)}
+
+    /* Stat band #2 — deep navy luxury */
+    .stat-band:nth-child(2){
+      background:linear-gradient(160deg,#06122E 0%,var(--navy-2) 100%);
+      border:1px solid rgba(184,134,11,.2);
+    }
+    .stat-band:nth-child(2) .stat-n{color:rgba(255,255,255,.18)}
+    .stat-band:nth-child(2) .stat-nm{color:var(--gold-hi);font-style:italic}
+    .stat-band:nth-child(2) .stat-txt{color:rgba(255,255,255,.48)}
+    .stat-band:nth-child(2)::after{color:rgba(255,255,255,.18)}
+
+    /* Service tab active — gold left border + subtle wash */
+    .svc-tab.active{background:linear-gradient(90deg,rgba(184,134,11,.09),transparent)}
+
+    /* Float CTA — gold glow */
+    .float-cta{box-shadow:0 8px 32px rgba(184,134,11,.4),0 2px 8px rgba(184,134,11,.2)}
+    .float-cta:hover{background:var(--ink);box-shadow:0 8px 32px rgba(12,24,48,.45)}
+
+    /* Hero outline text — refined navy stroke */
+    .hero-hl .out{-webkit-text-stroke:1.5px rgba(12,24,48,.4);color:transparent}
+
+    /* CTA rings — gold tint */
+    .cta-ring{border-color:rgba(184,134,11,.15)}
+
+    /* CTA phone — gold hover */
+    .cta-phone:hover{-webkit-text-fill-color:var(--gold-hi);background:none;animation:none}
+
+    /* Manifesto section decoration */
+    .manifesto::before{background:rgba(184,134,11,.05)}
+    .manifesto-label{color:rgba(255,255,255,.38);letter-spacing:.22em}
+
+    /* Gold shimmer line on section labels */
+    .about-lbl::after,.faq-lbl::after,.cta-lbl::after{
+      background:linear-gradient(90deg,var(--br),rgba(184,134,11,.25),transparent)
+    }
+
+    /* Footer logo gold accent */
+    .footer-logo{letter-spacing:-.05em}
+
+    /* Refined nav on scroll — deeper blur */
+    .nav.on{background:rgba(245,242,235,.96);backdrop-filter:blur(20px) saturate(1.4)}
+
+    /* Hero eye label */
+    .hero-eye{letter-spacing:.2em;font-size:11.5px}
+
+    /* Section border accents — subtle gold */
+    .services{border-top-color:rgba(184,134,11,.2)}
+    .about{border-top-color:rgba(184,134,11,.15)}
+    .faq{border-top-color:rgba(184,134,11,.15)}
+
+    /* Marquee — gold row refinement */
+    .mq-row.or{background:linear-gradient(90deg,#8B6208,var(--or),#8B6208)}
+
+    /* Stats band 1 & 3 refinement */
+    .stat-band:nth-child(1){background:#05091C}
+    .stat-band:nth-child(3){background:var(--wh)}
+    .stat-band:nth-child(4){background:#0A1428}
+
+    /* Luxury card refinement in services */
+    .sc-bar{background:#0A1428;border-bottom:1px solid rgba(184,134,11,.15)}
+    .sc-title{color:rgba(212,170,58,.65)}
+
+    /* Smooth body background */
+    body{background:var(--bg)}
   </style>
 </head>
 <body>
@@ -604,7 +689,7 @@
             <div class="sc-body">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
                 <div style="background:var(--bg);border-radius:8px;padding:10px">
-                  <div style="height:48px;background:linear-gradient(135deg,rgba(255,92,26,.15),var(--olt));border-radius:6px;margin-bottom:8px"></div>
+                  <div style="height:48px;background:linear-gradient(135deg,rgba(184,134,11,.15),var(--olt));border-radius:6px;margin-bottom:8px"></div>
                   <div style="font-size:12px;font-weight:700">เสื้อยืด basic</div>
                   <div style="font-size:13px;color:var(--or);font-weight:700">฿199</div>
                   <div style="font-size:11px;color:var(--mu)">สต๊อก: 24 ชิ้น</div>
